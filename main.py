@@ -75,7 +75,7 @@ with st.expander("", expanded=True):
     col1.metric("Number of members", int(df.count()["Name"]))
 
     col2.metric("Median Hours", round(df["Total Hours"].median(),2))
-    col2.metric("Members actively working", df['Logged In?'].value_counts()["yes"])
+    col2.metric("Members actively working", int(df['Logged In?'].value_counts()["yes"]))
 
     col3.metric("Standard Deviation", round(df["Total Hours"].std(),2))
 
