@@ -49,7 +49,6 @@ if "gc" or "gsheet" not in st.session_state:
         st.error(e)
         st.stop()
 
-# py -m  streamlit run c:\Users\tommy\Documents\AttendanceStreamlit\main.py
 
 st.title("Team 888's Attendance")
 
@@ -69,15 +68,21 @@ print("Displayed Bar Chart")
 # Blank expander + already expanded makes it look like a box
 with st.expander("", expanded=True):
     st.subheader("Quick stats")
+    
     col1,col2,col3 = st.columns(3)
 
-    col1.metric("Mean Hours",round(df["Total Hours"].mean(),2))
-    col1.metric("Number of members", int(df.count()["Name"]))
 
-    col2.metric("Median Hours", round(df["Total Hours"].median(),2))
-    col2.metric("Members actively working", int(df['Logged In?'].value_counts()["yes"]))
+    try: 
+        col1.metric("Mean Hours",round(df["Total Hours"].mean(skipna=True),2))
+        col1.metric("Number of members", int(df.count()["Name"]))
 
-    col3.metric("Standard Deviation", round(df["Total Hours"].std(),2))
+        col2.metric("Median Hours", round(df["Total Hours"].median(skipna=True),2))
+        col2.metric("Members actively working", int(df['Logged In?'].value_counts()["yes"]))
+
+        col3.metric("Standard Deviation", round(df["Total Hours"].std(skipna=True),2))
+
+    except TypeError:
+        st.error("Data is poorly formatted. Cannot load stats")
 
 # Attendance Leaderboard
 
