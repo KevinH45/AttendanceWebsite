@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import gspread
 import plotly.express as px
-import datetime as dt
 
 def top5(dictScoreList):
 
@@ -20,13 +19,14 @@ st.set_page_config(page_icon=":bar_chart",page_title="888 Attendance Stats", lay
 print("Set Page Config")
 
 
-@st.experimental_singleton
-def getGoogleSheet(date):
+
+if "gc" or "gsheet" not in st.session_state:
+
     try: 
         with st.spinner("Collecting our data..."):
 
             # Idk if secure or not
-            gc = gspread.service_account_from_dict(
+            st.session_state.gc = gspread.service_account_from_dict(
                 {
                     "type": st.secrets["type"],
                     "project_id": st.secrets["project_id"],
@@ -40,13 +40,10 @@ def getGoogleSheet(date):
                     "client_x509_cert_url": st.secrets["client_x509_cert_url"]
                 }
             )
-
             print("Connected to sheet")
 
-            gsheet =  gc.open_by_url("https://docs.google.com/spreadsheets/d/1_PnLrJySYRYBcNr_CdNmgOnXjARtGAc4wrznlw5Ee2A/edit#gid=0")
+            st.session_state.gsheet =  st.session_state.gc.open_by_url("https://docs.google.com/spreadsheets/d/1_PnLrJySYRYBcNr_CdNmgOnXjARtGAc4wrznlw5Ee2A/edit#gid=0")
             print("Downloaded sheet")
-
-            return gsheet
     except Exception as e:
         print(e)
         st.error(e)
@@ -55,8 +52,7 @@ def getGoogleSheet(date):
 
 st.title("Team 888's Attendance")
 
-gsheet = getGoogleSheet(dt.date.today())
-df = pd.DataFrame(gsheet.sheet1.get_all_records())
+df = pd.DataFrame(st.session_state.gsheet.sheet1.get_all_records())
 
 
 # Bar chart of attendance
@@ -99,8 +95,6 @@ with st.expander("", expanded=True):
 #         st.error("5th Place: " + leaderboard[4][0]+" with "+str(leaderboard[4][1])+" hours")
 #     else:
 #         st.error("No data found or data failed to load") 
-
-
 
 
 
