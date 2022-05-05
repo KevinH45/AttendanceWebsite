@@ -46,7 +46,7 @@ if "gc" or "gsheet" not in st.session_state:
             print("Downloaded sheet")
     except Exception as e:
         print(e)
-        st.error("Error: Could not connect to sheet")
+        st.error(e)
         st.stop()
 
 # py -m  streamlit run c:\Users\tommy\Documents\AttendanceStreamlit\main.py
