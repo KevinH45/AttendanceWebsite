@@ -73,13 +73,13 @@ with st.expander("", expanded=True):
 
 
     try: 
-        col1.metric("Mean Hours",round(df["Total Hours"].mean(skipna=True, numeric_only=True),2))
+        col1.metric("Mean Hours",round(df["Total Hours"].mean(skipna=True),2))
         col1.metric("Number of members", int(df.count()["Name"]))
 
-        col2.metric("Median Hours", round(df["Total Hours"].median(skipna=True, numeric_only=True),2))
+        col2.metric("Median Hours", round(df["Total Hours"].median(skipna=True),2))
         col2.metric("Members actively working", int(df['Logged In?'].value_counts()["yes"]))
 
-        col3.metric("Standard Deviation", round(df["Total Hours"].std(skipna=True, numberic_only=True),2))
+        col3.metric("Standard Deviation", round(df["Total Hours"].std(skipna=True),2))
 
     except TypeError:
         st.error("Data is poorly formatted. Cannot load stats")
