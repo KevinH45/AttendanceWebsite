@@ -18,11 +18,28 @@ def top5(dictScoreList):
 st.set_page_config(page_icon=":bar_chart",page_title="888 Attendance Stats", layout="centered")
 print("Set Page Config")
 
+
+
 if "gc" or "gsheet" not in st.session_state:
 
     try: 
         with st.spinner("Collecting our data..."):
-            st.session_state.gc = gspread.service_account_from_dict(st.secrets.gspreadCreds)
+
+            # Idk if secure or not
+            st.session_state.gc = gspread.service_account_from_dict(
+                {
+                    "type": st.secrets.type,
+                    "project_id": st.secrets.project_id,
+                    "private_key_id": st.secrets.private_key_id,
+                    "private_key": st.secrets.private_key,
+                    "client_email": st.secrets.client_email,
+                    "client_id": st.secrets.client_id,
+                    "auth_uri": st.secrets.auth_uri,
+                    "token_uri": st.secrets.token_uri,
+                    "auth_provider_x509_cert_url": st.secrets.auth_provider_x509_cert_url,
+                    "client_x509_cert_url": st.secrets.client_x509_cert_url,
+                }
+            )
             print("Connected to sheet")
 
             st.session_state.gsheet =  st.session_state.gc.open_by_url("https://docs.google.com/spreadsheets/d/1_PnLrJySYRYBcNr_CdNmgOnXjARtGAc4wrznlw5Ee2A/edit#gid=0")
@@ -42,7 +59,7 @@ print("Converted to DataFrame")
 
 # Bar chart of attendance
 
-totalHourFig = px.bar(df, x="Name", y="Total Hours").update_traces(marker=dict(color='#FF4B4B'))
+totalHourFig = px.bar(df, x="Name", y="Total Hours")
 print("Created Bar Chart")
 
 st.plotly_chart(totalHourFig)
