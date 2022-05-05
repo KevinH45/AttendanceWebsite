@@ -72,7 +72,7 @@ with st.expander("", expanded=True):
     col1,col2,col3 = st.columns(3)
 
     col1.metric("Mean Hours",round(df["Total Hours"].mean(),2))
-    col1.metric("Number of members", df.count()["Name"])
+    col1.metric("Number of members", int(df.count()["Name"]))
 
     col2.metric("Median Hours", round(df["Total Hours"].median(),2))
     col2.metric("Members actively working", df['Logged In?'].value_counts()["yes"])
