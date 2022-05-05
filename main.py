@@ -73,7 +73,11 @@ with st.expander("", expanded=True):
         col1.metric("Number of members", int(df.count()["Name"]))
 
         col2.metric("Median Hours", round(df["Total Hours"].median(skipna=True),2))
-        col2.metric("Members actively working", int(df['Logged In?'].value_counts()["yes"]))
+        
+        try:
+            col2.metric("Members actively working", int(df['Logged In?'].value_counts()["yes"]))
+        except KeyError:
+            col2.metric("Members actively working", 0)  # No one logged in
 
         col3.metric("Standard Deviation", round(df["Total Hours"].std(skipna=True),2))
         col3.metric("Total Hours", round(df["Total Hours"].sum(skipna=True),2))
