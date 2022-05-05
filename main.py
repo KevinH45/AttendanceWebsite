@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import gspread
 import plotly.express as px
+import datetime as dt
 
 def top5(dictScoreList):
 
@@ -19,14 +20,13 @@ st.set_page_config(page_icon=":bar_chart",page_title="888 Attendance Stats", lay
 print("Set Page Config")
 
 
-
-if "gc" or "gsheet" not in st.session_state:
-
+@st.experimental_singleton
+def getGoogleSheet(date):
     try: 
         with st.spinner("Collecting our data..."):
 
             # Idk if secure or not
-            st.session_state.gc = gspread.service_account_from_dict(
+            gc = gspread.service_account_from_dict(
                 {
                     "type": st.secrets["type"],
                     "project_id": st.secrets["project_id"],
@@ -40,10 +40,13 @@ if "gc" or "gsheet" not in st.session_state:
                     "client_x509_cert_url": st.secrets["client_x509_cert_url"]
                 }
             )
+
             print("Connected to sheet")
 
-            st.session_state.gsheet =  st.session_state.gc.open_by_url("https://docs.google.com/spreadsheets/d/1_PnLrJySYRYBcNr_CdNmgOnXjARtGAc4wrznlw5Ee2A/edit#gid=0")
+            gsheet =  gc.open_by_url("https://docs.google.com/spreadsheets/d/1_PnLrJySYRYBcNr_CdNmgOnXjARtGAc4wrznlw5Ee2A/edit#gid=0")
             print("Downloaded sheet")
+
+            return gsheet
     except Exception as e:
         print(e)
         st.error(e)
@@ -52,17 +55,14 @@ if "gc" or "gsheet" not in st.session_state:
 
 st.title("Team 888's Attendance")
 
-df = pd.DataFrame(st.session_state.gsheet.sheet1.get_all_records())
-print("Converted to DataFrame")
+gsheet = getGoogleSheet(dt.date.today())
+df = pd.DataFrame(gsheet.sheet1.get_all_records())
 
 
 # Bar chart of attendance
 
 totalHourFig = px.bar(df, x="Name", y="Total Hours")
-print("Created Bar Chart")
-
 st.plotly_chart(totalHourFig)
-print("Displayed Bar Chart")
 
 # Stats
 # Blank expander + already expanded makes it look like a box
@@ -80,6 +80,7 @@ with st.expander("", expanded=True):
         col2.metric("Members actively working", int(df['Logged In?'].value_counts()["yes"]))
 
         col3.metric("Standard Deviation", round(df["Total Hours"].std(skipna=True),2))
+        col3.metric("Total Hours", round(df["Total Hours"].sum(skipna=True),2))
 
     except TypeError:
         st.error("Data is poorly formatted. Cannot load stats")
